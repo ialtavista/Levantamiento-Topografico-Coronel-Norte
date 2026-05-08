@@ -9,7 +9,7 @@ var map = new ol.Map({
 });
 
 //initial view - epsg:3857 coordinates if not "Match project CRS"
-map.getView().fit([-8151677.339986, -4442605.723092, -8136009.075807, -4434456.257020], map.getSize());
+map.getView().fit([-8150926.547311, -4444309.389960, -8132562.575052, -4434535.596624], map.getSize());
 
 //full zooms only
 map.getView().setProperties({constrainResolution: true});
@@ -1093,18 +1093,6 @@ let measuring = false;
 
 //layer search
 
-var searchLayer = new SearchLayer({
-    layer: lyr_Cmara_3,
-    colName: 'IDENTIFICA',
-    zoom: 10,
-    collapsed: true,
-    map: map,
-    maxResults: 10,
-});
-map.addControl(searchLayer);
-document.getElementsByClassName('search-layer')[0].getElementsByTagName('button')[0].className += ' fa fa-binoculars';
-document.getElementsByClassName('search-layer-input-search')[0].placeholder = 'Search feature ...';
-    
 
 //scalebar
 
