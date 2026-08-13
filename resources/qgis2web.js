@@ -4,15 +4,15 @@ var map = new ol.Map({
     renderer: 'canvas',
     layers: layersList,
     view: new ol.View({
-         maxZoom: 28, minZoom: 1
+        constrainResolution: true,
+        maxZoom: 28,
+        minZoom: 1,
+        
     })
 });
 
 //initial view - epsg:3857 coordinates if not "Match project CRS"
-map.getView().fit([-8150926.547311, -4444309.389960, -8132562.575052, -4434535.596624], map.getSize());
-
-//full zooms only
-map.getView().setProperties({constrainResolution: true});
+map.getView().fit([-8150241.764001, -4443964.696383, -8136037.672954, -4434232.606598], map.getSize());
 
 //change cursor
 function pointerOnFeature(evt) {
@@ -153,7 +153,10 @@ var doHover = false;
 function createPopupField(currentFeature, currentFeatureKeys, layer) {
     var popupText = '';
     for (var i = 0; i < currentFeatureKeys.length; i++) {
-        if (currentFeatureKeys[i] != 'geometry' && currentFeatureKeys[i] != 'layerObject' && currentFeatureKeys[i] != 'idO') {
+        if (currentFeatureKeys[i] != 'geometry' &&
+            currentFeatureKeys[i] != 'layerObject' &&
+            currentFeatureKeys[i] != 'idO' &&
+            currentFeatureKeys[i] != '_mvtLayer_') {
             var popupField = '';
             if (layer.get('fieldLabels')[currentFeatureKeys[i]] == "hidden field") {
                 continue;
@@ -1129,16 +1132,19 @@ var bottomAttribution = new ol.control.Attribution({
 });
 map.addControl(bottomAttribution);
 
-var attributionList = document.createElement('li');
-attributionList.innerHTML = `
-	<a href="https://github.com/qgis2web/qgis2web">qgis2web</a> &middot;
-	<a href="https://openlayers.org/">OpenLayers</a> &middot;
-	<a href="https://qgis.org/">QGIS</a>	
-`;
-var bottomAttributionUl = bottomAttribution.element.querySelector('ul');
-if (bottomAttributionUl) {
-  bottomAttribution.element.insertBefore(attributionList, bottomAttributionUl);
-}
+map.once('rendercomplete', function() {
+  var bottomAttributionUl = bottomAttribution.element.querySelector('ul');
+  if (bottomAttributionUl) {
+    var layerAttrs = Array.from(bottomAttributionUl.querySelectorAll('li'))
+      .map(function(li) { return li.innerHTML.trim(); }).filter(Boolean);
+    var attribHtml = `
+    <a href="https://github.com/qgis2web/qgis2web">qgis2web</a> &middot;
+    <a href="https://openlayers.org/">OpenLayers</a> &middot;
+    <a href="https://qgis.org/">QGIS</a>`;
+    if (layerAttrs.length > 0) { attribHtml += ' &nbsp;|&nbsp; ' + layerAttrs.join(', '); }
+    bottomAttributionUl.innerHTML = '<li>' + attribHtml + '</li>';
+  }
+});
 
 
 // Disable "popup on hover" or "highlight on hover" if ol-control mouseover
